@@ -1,74 +1,84 @@
 import React, {useState} from 'react';
-import {Chat} from './Login/components/Chat.js';
-import {Login} from './Login/components/Login.js';
-import {AppWrapper} from './Login/components/AppWrapper.js';
+import {Chat} from './components/Chat.js';
+import {Login} from './components/Auth/Login.js';
+import {AppWrapper} from './components/AppWrapper.js';
 import Cookies from 'universal-cookie';
-import './App.css';
 import {
     BrowserRouter as Router,
     Routes,
     Route,
     Navigate,
 } from 'react-router-dom';
-import {Register} from './Login/components/Register.js';
+import {Register} from './components/Auth/Register.js';
+import {FindRoom} from './components/List Chat/FindRoom.js';
+import ListChat from './components/List Chat/ListChat.js';
 
 const cookies = new Cookies();
 
 function App() {
     const [isAuth, setIsAuth] = useState(cookies.get('auth-token'));
-    const [isInChat, setIsInChat] = useState(null);
+    const [isInChat, setIsInChat] = useState(false);
     const [room, setRoom] = useState('');
 
-    // If not authenticated, show login/register page
-    if (!isAuth) {
-        return (
-            <Router>
-                <Routes>
-                    <Route
-                        path='/login'
-                        element={
-                            <AppWrapper isAuth={isAuth} setIsAuth={setIsAuth}>
-                                <Login setIsAuth={setIsAuth} />
-                            </AppWrapper>
-                        }
-                    />
-                    <Route
-                        path='/register'
-                        element={
-                            <AppWrapper isAuth={isAuth} setIsAuth={setIsAuth}>
-                                <Register setIsAuth={setIsAuth} />
-                            </AppWrapper>
-                        }
-                    />
-                    {/* Redirect to login page if any other route is accessed */}
-                    <Route path='*' element={<Navigate to='/login' />} />
-                </Routes>
-            </Router>
-        );
-    }
-
     return (
-        <AppWrapper
-            isAuth={isAuth}
-            setIsAuth={setIsAuth}
-            setIsInChat={setIsInChat}
-        >
-            {!isInChat ? (
-                <div className='room'>
-                    <label> Type room name: </label>
-                    <input onChange={(e) => setRoom(e.target.value)} />
-                    <button
-                        onClick={() => {
-                            setIsInChat(true);
-                        }}
-                    >
-                        Enter Chat
-                    </button>
+        <Router>
+            <AppWrapper
+                isAuth={isAuth}
+                setIsAuth={setIsAuth}
+                setIsInChat={setIsInChat}
+            >
+                <div className='full-screen flex justify-center items-center'>
+                    <Routes>
+                        {!isAuth ? (
+                            <>
+                                <Route
+                                    path='/login'
+                                    element={<Login setIsAuth={setIsAuth} />}
+                                />
+                                <Route
+                                    path='/register'
+                                    element={<Register setIsAuth={setIsAuth} />}
+                                />
+                                <Route
+                                    path='*'
+                                    element={<Navigate to='/login' />}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Route
+                                    path='/findRoom'
+                                    element={
+                                        <FindRoom
+                                            setRoom={setRoom}
+                                            setIsInChat={setIsInChat}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path='/'
+                                    element={
+                                        <ListChat
+                                            setRoom={setRoom}
+                                            setIsInChat={setIsInChat}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path='/room/:roomName'
+                                    element={<Chat room={room} />}
+                                />
+
+                                <Route
+                                    path='/room/*'
+                                    element={<Navigate to={`/room/${room}`} />}
+                                />
+                            </>
+                        )}
+                    </Routes>
                 </div>
-            ) : (
-                <Chat room={room} />
-            )}
-        </AppWrapper>
+            </AppWrapper>
+        </Router>
     );
 }
 

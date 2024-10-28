@@ -6,7 +6,7 @@ import {
     signOut,
 } from 'firebase/auth';
 import {createContext, useContext, useEffect, useState} from 'react';
-import {auth} from '../../firebaseConfig';
+import {auth} from '../firebaseConfig';
 import {GoogleAuthProvider} from 'firebase/auth/web-extension';
 
 const userAuthContext = createContext();
