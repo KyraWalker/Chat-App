@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom'; // Import useNavigate
 import '../../styles/ListChat.css';
 import {db, auth} from '../../utils/firebaseConfig';
 import {collection, onSnapshot, query, where} from 'firebase/firestore';
-import {Chat} from '../Chat';
+import {Chat} from '../Chat/Chat';
 
 const ListChat = ({setRoom, setIsInChat}) => {
     const [rooms, setRooms] = useState([]);
