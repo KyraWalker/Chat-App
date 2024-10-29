@@ -1,5 +1,4 @@
-import React, {useState, useEffect} from 'react';
-import {db, auth} from '../../utils/firebaseConfig';
+import {useEffect, useState} from 'react';
 import {
     addDoc,
     collection,
@@ -9,16 +8,17 @@ import {
     where,
     orderBy,
 } from 'firebase/firestore';
-
+import {auth, db} from '../firebase-config';
 import '../styles/Chat.css';
-import {useNavigate} from 'react-router-dom';
+import {UserProfile} from './UserProfile'; // Import UserProfile
+import '@mdi/font/css/materialdesignicons.min.css';
 
 export const Chat = (props) => {
     const {room, signUserOut} = props;
     const [newMessage, setNewMessage] = useState('');
     const [messages, setMessages] = useState([]);
+    const [showProfile, setShowProfile] = useState(false);
 
-    const navigate = useNavigate();
     const messagesRef = collection(db, 'messages');
 
     useEffect(() => {
@@ -57,17 +57,26 @@ export const Chat = (props) => {
         return new Date(timestamp.seconds * 1000).toLocaleTimeString();
     };
 
+    const toggleProfile = () => {
+        setShowProfile(!showProfile);
+    };
+
     return (
         <div className='chat-app'>
             <div className='header'>
+                <button
+                    onClick={signUserOut}
+                    className='mdi mdi-arrow-left back-button'
+                ></button>
                 <h1 className='header-title'>{room.toUpperCase()}</h1>
-                <button onClick={signUserOut} className='sign-out-button'>
-                    <img
-                        src='../styles/icon/signout.png'
-                        alt='Sign Out'
-                        className='h-6 w-6'
-                    />
-                </button>
+                <button
+                    onClick={toggleProfile} // Toggle profile on click
+                    className='mdi mdi-account-circle-outline profile-button'
+                ></button>
+                <button
+                    onClick={signUserOut}
+                    className='mdi mdi-logout sign-out-button'
+                ></button>
             </div>
             <div className='messages'>
                 {messages.map((message) => (
@@ -105,11 +114,8 @@ export const Chat = (props) => {
                     ></button>
                 </div>
             </form>
-            <button
-                type='submit'
-                className='mdi mdi-send send-button'
-                onClick={() => navigate('/findRoom')}
-            ></button>
+            {showProfile && <UserProfile onClose={toggleProfile} />}{' '}
+            {/* Render UserProfile */}
         </div>
     );
 };
